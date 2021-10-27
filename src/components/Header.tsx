@@ -11,7 +11,9 @@ export function Header() {
   return (
     <div className="mb-2 shadow-lg navbar bg-neutral text-neutral-content rounded-box">
       <div className="flex-1 px-2 mx-2">
-        <span className="text-lg font-bold">{active ? "🟢" : error ? "🔴" : "🟠"}</span>
+        <span className="text-lg font-bold">
+          {active ? "🟢 Connected" : error ? "🔴 Error" : "🟠 Connect your wallet"}
+        </span>
       </div>
       <div className="flex-none hidden px-2 mx-2 lg:flex">
         <div className="flex items-stretch">

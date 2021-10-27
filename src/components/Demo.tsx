@@ -59,9 +59,6 @@ export default function Demo() {
       <div>{!!error && <h4 style={{ marginTop: "1rem", marginBottom: "0" }}>{getErrorMessage(error)}</h4>}</div>
       <div className="grid grid-cols-2 gap-2 px-2 py-4">
         <div className="card bordered">
-          <figure>
-            <img className="h-24" src="https://metamask.io/images/mm-logo.svg" alt="metamask" />
-          </figure>
           <div className="card-body">
             <h2 className="card-title">
               <a className="link link-hover" href="https://metamask.io/" target="_blank" rel="noreferrer">
@@ -128,9 +125,6 @@ export default function Demo() {
           </div>
         </div>
         <div className="card bordered">
-          <figure>
-            <img className="h-24" src="https://walletconnect.org/walletconnect-logo.svg" alt="wallet connect" />
-          </figure>
           <div className="card-body">
             <h2 className="card-title">
               <a className="link link-hover" href="https://walletconnect.org/" target="_blank" rel="noreferrer">
