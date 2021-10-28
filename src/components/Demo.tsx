@@ -1,195 +1,89 @@
-import { Web3Provider } from "@ethersproject/providers";
-import { useWeb3React, UnsupportedChainIdError } from "@web3-react/core";
-import {
-  NoEthereumProviderError,
-  UserRejectedRequestError as UserRejectedRequestErrorInjected,
-} from "@web3-react/injected-connector";
-import { UserRejectedRequestError as UserRejectedRequestErrorWalletConnect } from "@web3-react/walletconnect-connector";
-import { useEffect, useState } from "react";
-
-import { injected, walletconnect, POLLING_INTERVAL } from "../dapp/connectors";
-import { useEagerConnect, useInactiveListener } from "../dapp/hooks";
-import logger from "../logger";
+import Funding from "./Funding";
 import { Header } from "./Header";
 
-function getErrorMessage(error: Error) {
-  if (error instanceof NoEthereumProviderError) {
-    return "No Ethereum browser extension detected, install MetaMask on desktop or visit from a dApp browser on mobile.";
-  }
-  if (error instanceof UnsupportedChainIdError) {
-    return "You're connected to an unsupported network.";
-  }
-  if (error instanceof UserRejectedRequestErrorInjected || error instanceof UserRejectedRequestErrorWalletConnect) {
-    return "Please authorize this website to access your Ethereum account.";
-  }
-  logger.error(error);
-  return "An unknown error occurred. Check the console for more details.";
-}
-
-export function getLibrary(provider: any): Web3Provider {
-  const library = new Web3Provider(provider);
-  library.pollingInterval = POLLING_INTERVAL;
-  return library;
-}
-
 export default function Demo() {
-  const context = useWeb3React<Web3Provider>();
-  const { connector, library, account, activate, deactivate, active, error } = context;
-
-  // handle logic to recognize the connector currently being activated
-  const [activatingConnector, setActivatingConnector] = useState<any>();
-  useEffect(() => {
-    if (activatingConnector && activatingConnector === connector) {
-      setActivatingConnector(undefined);
-    }
-  }, [activatingConnector, connector]);
-
-  // handle logic to eagerly connect to the injected ethereum provider, if it exists and has granted access already
-  const triedEager = useEagerConnect();
-
-  // handle logic to connect in reaction to certain events on the injected ethereum provider, if it exists
-  useInactiveListener(!triedEager || !!activatingConnector);
-
-  const activating = (connection: typeof injected | typeof walletconnect) => connection === activatingConnector;
-  const connected = (connection: typeof injected | typeof walletconnect) => connection === connector;
-  const disabled = !triedEager || !!activatingConnector || connected(injected) || connected(walletconnect) || !!error;
   return (
     <>
       <Header />
-      <div>{!!error && <h4 style={{ marginTop: "1rem", marginBottom: "0" }}>{getErrorMessage(error)}</h4>}</div>
-      <div className="grid grid-cols-2 gap-2 px-2 py-4">
-        <div className="card bordered">
-          <div className="card-body">
-            <h2 className="card-title">
-              <a className="link link-hover" href="https://metamask.io/" target="_blank" rel="noreferrer">
-                MetaMask
-              </a>
-            </h2>
-            <p>A crypto wallet & gateway to blockchain apps</p>
-            <div className="justify-end card-actions">
-              <button
-                type="button"
-                className="btn btn-primary"
-                disabled={disabled}
-                onClick={() => {
-                  setActivatingConnector(injected);
-                  activate(injected);
-                }}
-              >
-                <div className="px-2 py-4">
-                  {activating(injected) && <p className="btn loading">loading...</p>}
-                  {connected(injected) && (
-                    <span role="img" aria-label="check">
-                      ✅
-                    </span>
-                  )}
-                </div>
-                Connect with MetaMask
-              </button>
-              {(active || error) && connected(injected) && (
-                <>
-                  {!!(library && account) && (
-                    <button
-                      type="button"
-                      className="btn btn-primary"
-                      onClick={() => {
-                        library
-                          .getSigner(account)
-                          .signMessage("👋")
-                          .then((signature: any) => {
-                            window.alert(`Success!\n\n${signature}`);
-                          })
-                          .catch((err: Error) => {
-                            window.alert(`Failure!${err && err.message ? `\n\n${err.message}` : ""}`);
-                          });
-                      }}
-                    >
-                      Sign Message
-                    </button>
-                  )}
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={() => {
-                      if (connected(walletconnect)) {
-                        (connector as any).close();
-                      }
-                      deactivate();
-                    }}
-                  >
-                    Deactivate
-                  </button>
-                </>
-              )}
-            </div>
+      <div className="w-full shadow stats bg-white">
+        <div className="stat">
+          <div className="stat-figure text-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-8 h-8 stroke-current">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+            </svg>
           </div>
+          <div className="stat-title">Total BNB commited</div>
+          <div className="stat-value text-primary">25.6K BNB</div>
         </div>
-        <div className="card bordered">
-          <div className="card-body">
-            <h2 className="card-title">
-              <a className="link link-hover" href="https://walletconnect.org/" target="_blank" rel="noreferrer">
-                Wallet Connect
-              </a>
-            </h2>
-            <p>Open protocol for connecting Wallets to Dapps</p>
-            <div className="justify-end card-actions">
-              <button
-                type="button"
-                className="btn btn-primary"
-                disabled={disabled}
-                onClick={() => {
-                  setActivatingConnector(walletconnect);
-                  activate(walletconnect);
-                }}
-              >
-                <div className="px-2 py-4">
-                  {activating(walletconnect) && <p className="btn loading">loading...</p>}
-                  {connected(walletconnect) && (
-                    <span role="img" aria-label="check">
-                      ✅
-                    </span>
-                  )}
-                </div>
-                Connect with WalletConnect
-              </button>
-              {(active || error) && connected(walletconnect) && (
-                <>
-                  {!!(library && account) && (
-                    <button
-                      type="button"
-                      className="btn btn-primary"
-                      onClick={() => {
-                        library
-                          .getSigner(account)
-                          .signMessage("👋")
-                          .then((signature: any) => {
-                            window.alert(`Success!\n\n${signature}`);
-                          })
-                          .catch((err: Error) => {
-                            window.alert(`Failure!${err && err.message ? `\n\n${err.message}` : ""}`);
-                          });
-                      }}
-                    >
-                      Sign Message
-                    </button>
-                  )}
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={() => {
-                      if (connected(walletconnect)) {
-                        (connector as any).close();
-                      }
-                      deactivate();
-                    }}
-                  >
-                    Deactivate
-                  </button>
-                </>
-              )}
-            </div>
+        <div className="stat">
+          <div className="stat-figure text-info">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="inline-block w-8 h-8 stroke-current">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
           </div>
+          <div className="stat-title">Total lauchpad</div>
+          <div className="stat-value text-info">2.6M</div>
         </div>
+        <div className="stat">
+          <div className="stat-figure text-success">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+          </div>
+          <div className="stat-title">Success rate</div>
+          <div className="stat-value text-success">86%</div>
+        </div>
+      </div>
+
+      <div className="my-8">
+        <ul className="w-full steps">
+          <li data-content="🙌" className="step step-primary">
+            <span className="text-xl">Funding</span>
+            <div className="text-lg text-success">
+              Locked
+            </div>
+          </li>
+          <li data-content="🔒" className="step step-primary">
+            <span className="text-xl">Locking
+              <div className="grid grid-flow-col gap-5 place-items-end auto-cols-max">
+                <div>
+                  <span className="font-mono text-xl">
+                    <span>10</span>
+                  </span>
+                  days
+                </div>
+                <div>
+                  <span className="font-mono text-xl">
+                    <span>10</span>
+                  </span>
+                  hours
+                </div>
+                <div>
+                  <span className="font-mono text-xl">
+                    <span>10</span>
+                  </span>
+                  min
+                </div>
+                <div>
+                  <span className="font-mono text-xl">
+                    <span>9</span>
+                  </span>
+                  sec
+                </div>
+              </div>
+            </span>
+          </li>
+          <li data-content="🎉" className="step">
+            <span className="text-xl">Reward</span>
+          </li>
+          <li data-content="🤕" className="step">
+            <span className="text-xl">Claim cover</span>
+          </li>
+        </ul>
+      </div>
+
+      <div>
+        <Funding />
       </div>
     </>
   );
