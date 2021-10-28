@@ -8,6 +8,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract Morphling is Ownable {
     uint256 private bonus_percent;
     mapping (address => uint256) cover_tokens;
+    address[] cover_tokens_address;
     uint256 private cover_pool_total;
     mapping (address => uint256) staking_pool;
     uint256 private staking_pool_total = 0;
@@ -88,6 +89,13 @@ contract Morphling is Ownable {
 
         cover_token.transferFrom(msg.sender, address(this), _amount);
         cover_tokens[_token_address] += _amount;
+        if (cover_tokens[_token_address] <= 0) {
+            cover_tokens_address.push(_token_address);
+        }
+    }
+
+    function get_cover_token_address() public view returns (address[] memory) {
+        return cover_tokens_address;
     }
 
     /**

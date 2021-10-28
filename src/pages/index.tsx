@@ -1,6 +1,6 @@
 import { Web3Provider } from "@ethersproject/providers";
 import { Web3ReactProvider } from "@web3-react/core";
-import Head from 'next/head'
+import Head from "next/head";
 
 import Demo from "../components/Demo";
 import { POLLING_INTERVAL } from "../dapp/connectors";
