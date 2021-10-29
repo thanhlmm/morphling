@@ -5,6 +5,7 @@ import { useCountDown } from "ahooks";
 import cls from "classnames";
 import dayjs from "dayjs";
 import { BigNumber } from "ethers";
+import dynamic from "next/dynamic";
 import numeral from "numeral";
 import { useEffect, useMemo, useState } from "react";
 
@@ -17,6 +18,8 @@ import DepositCover from "./DepositCover";
 import DepositReward from "./DepositReward";
 import FormatNumber from "./FormatNumber";
 import WithdrawBNB from "./WithdrawBNB";
+
+const AnimatedNumbers = dynamic(() => import("react-animated-numbers"), { ssr: false });
 
 // TODO: Query from api
 const mockStateApi = {
@@ -52,6 +55,21 @@ const Funding = () => {
 
     return (Number(formatUnits(totalStacking)) / totalCover).toFixed(2) || 0;
   }, [totalCover, totalStacking]);
+
+  const handleGetReward = async () => {
+    const contract = getContract();
+    contract
+      .connect(library.getSigner())
+      .widthdraw_reward()
+      .then((data) => {
+        if (data.wait) {
+          return data.wait(7);
+        }
+      })
+      .then(() => {
+        // TODO: Close modal
+      });
+  };
 
   const handleNextState = async () => {
     const contract = getContract();
@@ -94,21 +112,29 @@ const Funding = () => {
   const isReward = launchpadStateStr === CONTRACT_STATE.REWARD;
   const isClaimCover = launchpadStateStr === CONTRACT_STATE.CLAIM_COVER;
 
+  console.log({ launchpadStateStr });
+
   return (
     <div className="flex flex-col items-center mb-8">
       <div className="my-8">
         <ul className="w-full steps">
-          <li data-content="🙌" className={cls("step", { "step-primary": isFunding })}>
+          <li
+            data-content="🙌"
+            className={cls("step", { "step-primary": launchpadStateStr >= CONTRACT_STATE.FUNDING })}
+          >
             <span className="text-xl">Funding</span>
             {isLocking && <div className="text-lg text-success">Locked</div>}
             {isFunding && mockStateApi.funding && <Countdown date={mockStateApi.funding} />}
           </li>
-          <li data-content="🔒" className={cls("step", { "step-primary": isLocking })}>
+          <li
+            data-content="🔒"
+            className={cls("step", { "step-primary": launchpadStateStr >= CONTRACT_STATE.LOCKING })}
+          >
             <span className="text-xl">Locking</span>
             {isReward && <div className="text-lg text-success">Locked</div>}
             {isLocking && mockStateApi.locking && <Countdown date={mockStateApi.locking} />}
           </li>
-          <li data-content="🎉" className={cls("step", { "step-primary": isReward })}>
+          <li data-content="🎉" className={cls("step", { "step-primary": launchpadStateStr >= CONTRACT_STATE.REWARD })}>
             <span className="text-xl">Reward</span>
             {isReward && mockStateApi.reward && <Countdown date={mockStateApi.reward} showDay={false} />}
           </li>
@@ -139,10 +165,16 @@ const Funding = () => {
                 <FormatNumber number={totalStacking} unit="BNB" />
               </div>
               <div className="space-x-2 stat-actions">
-                <a className="btn btn-sm btn-primary" href="#deposit-bnb">
+                <a
+                  className={cls("btn btn-sm", { "btn-primary": isFunding, "btn-disabled": !isFunding })}
+                  href="#deposit-bnb"
+                >
                   Deposit
                 </a>
-                <a className="btn btn-sm btn-success" href="#withdraw-bnb">
+                <a
+                  className={cls("btn btn-sm", { "btn-success": isFunding, "btn-disabled": !isFunding })}
+                  href="#withdraw-bnb"
+                >
                   Withdraw
                 </a>
               </div>
@@ -168,7 +200,9 @@ const Funding = () => {
               </div>
             </div>
             <div className="ml-6 space-x-2 stat-actions">
-              <button className="btn btn-primary">Get reward</button>
+              <button onClick={handleGetReward} className="btn btn-primary" disabled={!isReward}>
+                Get reward
+              </button>
             </div>
           </div>
         </div>
@@ -176,7 +210,20 @@ const Funding = () => {
         <div className="flex flex-col">
           <div className="border-0 stat">
             <div className="stat-title">Risk ratio</div>
-            <div className="stat-value">{riskRatio}</div>
+            <div className="stat-value">
+              <AnimatedNumbers
+                includeComma
+                animateToNumber={Number(riskRatio)}
+                configs={[
+                  { mass: 1, tension: 300, friction: 100 },
+                  { mass: 1, tension: 300, friction: 100 },
+                  { mass: 1, tension: 300, friction: 100 },
+                  { mass: 1, tension: 300, friction: 100 },
+                  { mass: 1, tension: 300, friction: 100 },
+                  { mass: 1, tension: 300, friction: 100 },
+                ]}
+              ></AnimatedNumbers>
+            </div>
             <div className="stat-desc text-info">Cover balance / Total staking pool</div>
             <div className="max-w-md whitespace-normal stat-actions">
               <p>When issue happends, the cover turns into claimable to cover the risk</p>
@@ -184,7 +231,21 @@ const Funding = () => {
           </div>
           <div className="!border-0 stat">
             <div className="stat-title">Your share</div>
-            <div className="stat-value">{(userShare.toNumber() / 10).toFixed()}%</div>
+            <div className="flex stat-value">
+              <AnimatedNumbers
+                includeComma
+                animateToNumber={Number((userShare.toNumber() / 10).toFixed())}
+                configs={[
+                  { mass: 1, tension: 200, friction: 100 },
+                  { mass: 1, tension: 200, friction: 100 },
+                  { mass: 1, tension: 200, friction: 100 },
+                  { mass: 1, tension: 200, friction: 100 },
+                  { mass: 1, tension: 200, friction: 100 },
+                  { mass: 1, tension: 200, friction: 100 },
+                ]}
+              ></AnimatedNumbers>
+              %
+            </div>
             <div className="max-w-md whitespace-normal stat-actions">
               <p>Your share in staking pool. The reward will returns based on this share</p>
             </div>
