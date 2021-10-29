@@ -19,8 +19,6 @@ import DepositReward from "./DepositReward";
 import FormatNumber from "./FormatNumber";
 import WithdrawBNB from "./WithdrawBNB";
 
-const AnimatedNumbers = dynamic(() => import("react-animated-numbers"), { ssr: false });
-
 // TODO: Query from api
 const mockStateApi = {
   funding: dayjs().add(1, "d").toDate(),
@@ -53,8 +51,23 @@ const Funding = () => {
       return 0;
     }
 
-    return (Number(formatUnits(totalStacking)) / totalCover).toFixed(2) || 0;
+    return (Number(formatUnits(totalStacking)) / totalCover).toFixed(4) || 0;
   }, [totalCover, totalStacking]);
+
+  const handleWithdrawFund = async () => {
+    const contract = getContract();
+    contract
+      .connect(library.getSigner())
+      .withdraw_fund(account)
+      .then((data) => {
+        if (data.wait) {
+          return data.wait(7);
+        }
+      })
+      .then(() => {
+        // TODO: Close modal
+      });
+  };
 
   const handleGetReward = async () => {
     const contract = getContract();
@@ -210,20 +223,7 @@ const Funding = () => {
         <div className="flex flex-col">
           <div className="border-0 stat">
             <div className="stat-title">Risk ratio</div>
-            <div className="stat-value">
-              <AnimatedNumbers
-                includeComma
-                animateToNumber={Number(riskRatio)}
-                configs={[
-                  { mass: 1, tension: 300, friction: 100 },
-                  { mass: 1, tension: 300, friction: 100 },
-                  { mass: 1, tension: 300, friction: 100 },
-                  { mass: 1, tension: 300, friction: 100 },
-                  { mass: 1, tension: 300, friction: 100 },
-                  { mass: 1, tension: 300, friction: 100 },
-                ]}
-              ></AnimatedNumbers>
-            </div>
+            <div className="stat-value">{riskRatio}</div>
             <div className="stat-desc text-info">Cover balance / Total staking pool</div>
             <div className="max-w-md whitespace-normal stat-actions">
               <p>When issue happends, the cover turns into claimable to cover the risk</p>
@@ -231,21 +231,7 @@ const Funding = () => {
           </div>
           <div className="!border-0 stat">
             <div className="stat-title">Your share</div>
-            <div className="flex stat-value">
-              <AnimatedNumbers
-                includeComma
-                animateToNumber={Number((userShare.toNumber() / 10).toFixed())}
-                configs={[
-                  { mass: 1, tension: 200, friction: 100 },
-                  { mass: 1, tension: 200, friction: 100 },
-                  { mass: 1, tension: 200, friction: 100 },
-                  { mass: 1, tension: 200, friction: 100 },
-                  { mass: 1, tension: 200, friction: 100 },
-                  { mass: 1, tension: 200, friction: 100 },
-                ]}
-              ></AnimatedNumbers>
-              %
-            </div>
+            <div className="flex stat-value">{(userShare.toNumber() / 10).toFixed()}%</div>
             <div className="max-w-md whitespace-normal stat-actions">
               <p>Your share in staking pool. The reward will returns based on this share</p>
             </div>
@@ -259,19 +245,19 @@ const Funding = () => {
           <button onClick={handleNextState} className="btn btn-error">
             Next status
           </button>
-          <a href="#deposit-cover" className="btn btn-info">
+          <a href="#deposit-cover" className={cls("btn", { "btn-info": isFunding, "btn-disabled": !isFunding })}>
             1. Add Cover fund
           </a>
 
-          <a href="#deposit-cover" className="btn btn-info">
+          <button onClick={handleWithdrawFund} disabled={!isLocking} className="btn btn-info">
             2. Withdraw staking fund
-          </a>
+          </button>
 
           <a href="#deposit-reward" className="btn btn-info">
             3. Deposit reward
           </a>
 
-          <button disabled className="btn btn-info">
+          <button disabled={!isReward} className="btn btn-info">
             4. Get reward
           </button>
 

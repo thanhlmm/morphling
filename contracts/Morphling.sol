@@ -106,7 +106,7 @@ contract Morphling is Ownable {
         // TODO: Check only withdraw 1 time
         // staking_pool_total = 0;
         bool sent = _to.send(staking_pool_total);
-        require(sent, "Failed to send Ether");
+        require(sent, "Failed to send BNB");
     }
 
     /**
@@ -144,9 +144,11 @@ contract Morphling is Ownable {
 
         address payable recipient = payable(msg.sender);
         // Withdraw BNB
-        recipient.transfer((reward_bnb_total * share) / ROUND);
+        bool sent = recipient.send((reward_bnb_total * share) / ROUND);
+        require(sent, "Failed to send BNB");
         // Withdraw Token
-        reward_token.transfer(msg.sender, (reward_token_total * share) / ROUND);
+        bool sentToken = reward_token.transfer(msg.sender, (reward_token_total * share) / ROUND);
+        require(sentToken, "Failed to send Token");
     }
 
     /**
