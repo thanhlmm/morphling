@@ -2,9 +2,9 @@ import { useWeb3React } from "@web3-react/core";
 
 // Ref: https://chainlist.org/
 const chainIdMapping = {
-  45: 'BSC-Mainnet',
-  97: 'BSC-Mainnet'
-}
+  45: "BSC-Mainnet",
+  97: "BSC-Testnet",
+};
 
 export function ChainId() {
   const { chainId } = useWeb3React();
@@ -16,7 +16,7 @@ export function ChainId() {
     <div className="btn btn-ghost btn-sm rounded-btn">
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        className="w-6 h-6 hover:text-blue-400 mr-2"
+        className="w-6 h-6 mr-2 hover:text-blue-400"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
