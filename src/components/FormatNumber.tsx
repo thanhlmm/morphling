@@ -1,10 +1,10 @@
 import { formatUnits } from "@ethersproject/units";
 
 // TODO: Add animation when change
-const FormatNumber = ({ number, format = "ether", unit = "" }) => {
+const FormatNumber = ({ number, format = "ether", unit = "", fixed = 5 }) => {
   return (
     <span>
-      {formatUnits(number, format)} {unit}
+      {Number(formatUnits(number, format)).toFixed(fixed)} {unit}
     </span>
   );
 };

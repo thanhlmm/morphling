@@ -10,9 +10,9 @@
     "lint:sol": "npx solhint 'contracts/**/*.sol'",
     "test": "mocha --exit --recursive",
     "compile": "hardhat compile",
-    "deploy-local": "hardhat run scripts/deploy.js --network localhost",
-    "deploy-test": "hardhat run scripts/deploy.js --network testnet",
-    "verify-test": "hardhat verify --constructor-args arguments.js 0xa13d09CA1F10d7bBf1774387FF51A42b8432e101 --network testnet"
+    "deploy-local": "hardhat run scripts/deploy.ts --network localhost",
+    "deploy-test": "hardhat run scripts/deploy.ts --network testnet",
+    "verify-test": "hardhat verify --constructor-args arguments.js 0x0bd1433Ad789402F5502211a83fAa37876AC5be4 --network testnet"
   },
   "dependencies": {
     "@ethersproject/providers": "5.5.0",
@@ -26,6 +26,7 @@
     "loglevel": "1.7.1",
     "moralis": "^0.0.110",
     "next": "12.0.1",
+    "numeral": "^2.0.6",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-hook-form": "^7.18.0",

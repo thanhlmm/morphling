@@ -3,7 +3,6 @@
 //
 // When running the script with `npx hardhat run <script>` you'll find the Hardhat
 // Runtime Environment's members available in the global scope.
-// eslint-disable-next-line import/no-extraneous-dependencies
 import hre from "hardhat";
 
 async function main() {
@@ -15,23 +14,17 @@ async function main() {
   // await hre.run('compile');
 
   // We get the contract to deploy
-  const ITManToken = await hre.ethers.getContractFactory("ITManToken");
-  const itManToken = await hre.upgrades.deployProxy(ITManToken);
+  const Morphling = await hre.ethers.getContractFactory("Morphling");
+  const morphling = await Morphling.deploy(5, process.env.REWARD_TOKEN); // BUSD
 
-  await itManToken.deployed();
-  console.log("ITManToken deployed to:", itManToken.address);
-  console.log("Name", await itManToken.name());
-  console.log("Symbol", await itManToken.symbol());
-  console.log("Decimals", await itManToken.decimals());
-  console.log("Total Supply", await itManToken.totalSupply());
-  console.log("Owner", await itManToken.owner());
+  await morphling.deployed();
+
+  console.log("Morphling deployed to:", morphling.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
 // and properly handle errors.
-main()
-  .then(() => process.exit(0))
-  .catch((error) => {
-    console.error(error);
-    process.exit(1);
-  });
+main().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});

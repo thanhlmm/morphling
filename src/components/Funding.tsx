@@ -1,31 +1,45 @@
 import { Web3Provider } from "@ethersproject/providers";
+import { formatUnits } from "@ethersproject/units";
 import { useWeb3React } from "@web3-react/core";
 import { BigNumber } from "ethers";
+import numeral from "numeral";
 import { useEffect, useMemo, useState } from "react";
 
-import { getContract } from "../dapp/contract";
-import { getTokenPrice } from "../dapp/molaris";
+import { CONTRACT_ADDRESS, getContract } from "../dapp/contract";
+import { getTokenPrice, getUserTokensBalance } from "../dapp/molaris";
 import useContractView from "../hooks/useContractView";
+import DepositBNB from "./DepositBNB";
 import DepositCover from "./DepositCover";
+import DepositReward from "./DepositReward";
 import FormatNumber from "./FormatNumber";
+import WithdrawBNB from "./WithdrawBNB";
 
 const Funding = () => {
   const { account, library, chainId } = useWeb3React<Web3Provider>();
+  const [totalCover, setTotalCover] = useState(0);
 
-  const totalStacking = useContractView("get_total_fund", [], 0);
-  const userShare = useContractView("get_user_share", [account], 0);
+  const totalStacking = useContractView("get_total_fund", [], BigNumber.from(0));
+  const userShare = useContractView("get_user_share", [account], BigNumber.from(0));
 
-  const totalRewardToken = useContractView("get_total_reward_token", [], 0);
-  const totalRewardBNB = useContractView("get_total_reward_bnb", [], 0);
+  const totalRewardToken = useContractView("get_total_reward_token", [], BigNumber.from(0));
+  const totalRewardBNB = useContractView("get_total_reward_bnb", [], BigNumber.from(0));
+  const contractOwner = useContractView("owner", [], "");
+  const isContractOwner = account && account.toUpperCase() === contractOwner?.toUpperCase();
 
-  // useEffect(() => {
-  //   const price = getTokenPrice("0xe9e7cea3dedca5984780bafc599bd69add087d56").then(console.log);
-  // }, []);
+  const coverAddress = useContractView("get_cover_token_address", [], []);
+  const tokensAmount = useMemo(() => {
+    if (Array.isArray(coverAddress)) {
+      getUserTokensBalance(CONTRACT_ADDRESS, coverAddress).then(setTotalCover);
+    }
+  }, [coverAddress]);
 
-  // const coverAddress = useContractView("get_cover_token_address", [], []);
-  // const tokensAmount = useMemo(() => {
-  //   console.log(coverAddress);
-  // }, [coverAddress]);
+  const riskRatio = useMemo(() => {
+    if (totalCover <= 0) {
+      return 0;
+    }
+
+    return (Number(formatUnits(totalStacking)) / totalCover).toFixed(2) || 0;
+  }, [totalCover, totalStacking]);
 
   return (
     <div className="flex justify-center mb-8">
@@ -34,11 +48,14 @@ const Funding = () => {
           <div className="items-start stats">
             <div className="stat">
               <div className="stat-title">Cover balance</div>
-              <div className="stat-value">$89,400</div>
+              {/* <div className="stat-value">{numeral(totalCover, "$0,0.00")}</div> */}
+              <div className="stat-value">{numeral(totalCover).format("$0,0.00")}</div>
               <div className="space-x-2 stat-actions">
-                <a href="#deposit-cover" className="btn btn-sm btn-primary">
-                  Add funds
-                </a>
+                {isContractOwner && (
+                  <a href="#deposit-cover" className="btn btn-sm btn-primary">
+                    Add funds
+                  </a>
+                )}
                 <button className="btn btn-sm btn-success">Claim</button>
               </div>
             </div>
@@ -78,6 +95,11 @@ const Funding = () => {
             </div>
             <div className="ml-6 space-x-2 stat-actions">
               <button className="btn btn-primary">Get reward</button>
+              {isContractOwner && (
+                <a href="#deposit-reward" className="btn btn-success">
+                  Deposit reward
+                </a>
+              )}
             </div>
           </div>
         </div>
@@ -85,15 +107,15 @@ const Funding = () => {
         <div className="flex flex-col">
           <div className="border-0 stat">
             <div className="stat-title">Risk ratio</div>
-            <div className="stat-value">0.42</div>
-            <div className="stat-desc text-info">Total staking pool / Cover balance</div>
+            <div className="stat-value">{riskRatio}</div>
+            <div className="stat-desc text-info">Cover balance / Total staking pool</div>
             <div className="max-w-md whitespace-normal stat-actions">
               <p>When issue happends, the cover turns into claimable to cover the risk</p>
             </div>
           </div>
           <div className="!border-0 stat">
             <div className="stat-title">Your share</div>
-            <div className="stat-value">{(BigNumber.from(userShare).toNumber() / 10).toFixed()}%</div>
+            <div className="stat-value">{(userShare.toNumber() / 10).toFixed()}%</div>
             <div className="max-w-md whitespace-normal stat-actions">
               <p>Your share in staking pool. The reward will returns based on this share</p>
             </div>
@@ -104,28 +126,18 @@ const Funding = () => {
       <div id="deposit-cover" className="modal">
         <div className="modal-box">
           <DepositCover />
+          <div className="modal-action">
+            <a href="#" className="btn btn-sm">
+              Close
+            </a>
+          </div>
         </div>
       </div>
 
       <div id="deposit-bnb" className="modal">
         <div className="modal-box">
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text">BNB Amount</span>
-            </label>
-            <div className="relative">
-              <input
-                type="number"
-                placeholder="0"
-                className="w-full pr-16 border input input-primary input-bordered border-primary"
-              />
-              <button className="absolute top-0 right-0 rounded-l-none btn btn-primary">max</button>
-            </div>
-
-            <input type="range" max="100" value="50" className="range range-primary" />
-          </div>
+          <DepositBNB />
           <div className="modal-action">
-            <button className="btn btn-sm btn-primary">Accept</button>
             <a href="#" className="btn btn-sm">
               Close
             </a>
@@ -135,23 +147,19 @@ const Funding = () => {
 
       <div id="withdraw-bnb" className="modal">
         <div className="modal-box">
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text">BNB Amount</span>
-            </label>
-            <div className="relative">
-              <input
-                type="number"
-                placeholder="0"
-                className="w-full pr-16 border input input-primary input-bordered border-primary"
-              />
-              <button className="absolute top-0 right-0 rounded-l-none btn btn-primary">max</button>
-            </div>
-
-            <input type="range" max="100" value="50" className="range range-primary" />
-          </div>
+          <WithdrawBNB />
           <div className="modal-action">
-            <button className="btn btn-sm btn-primary">Accept</button>
+            <a href="#" className="btn btn-sm">
+              Close
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div id="deposit-reward" className="modal">
+        <div className="modal-box">
+          <DepositReward />
+          <div className="modal-action">
             <a href="#" className="btn btn-sm">
               Close
             </a>

@@ -78,7 +78,7 @@ contract Morphling is Ownable {
         staking_pool_total -= _amount;
 
         address payable recipient = payable(msg.sender);
-        recipient.transfer(msg.value);
+        recipient.transfer(_amount);
     }
 
     function deposit_cover(address _token_address, uint256 _amount) payable public onlyOwner {
@@ -88,10 +88,10 @@ contract Morphling is Ownable {
         require(_amount > 0, "Missing amount");
 
         cover_token.transferFrom(msg.sender, address(this), _amount);
-        cover_tokens[_token_address] += _amount;
         if (cover_tokens[_token_address] <= 0) {
             cover_tokens_address.push(_token_address);
         }
+        cover_tokens[_token_address] += _amount;
     }
 
     function get_cover_token_address() public view returns (address[] memory) {
@@ -121,14 +121,16 @@ contract Morphling is Ownable {
     }
 
     function deposit_reward_bnb() payable public {
+        // TODO: Remove me
         reward_bnb_total += msg.value;
     }
 
-    function deposit_reward_token(uint256 _amount) public onlyOwner {
+    function deposit_reward_token(uint256 _amount) payable public onlyOwner {
         uint256 tokenBalance = reward_token.balanceOf(msg.sender);
         require(_amount <= tokenBalance, "balance is low");
         reward_token.transferFrom(msg.sender, address(this), _amount);
 
+        reward_bnb_total += msg.value;
         reward_token_total += _amount;
     }
 
