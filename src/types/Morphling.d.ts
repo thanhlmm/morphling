@@ -256,7 +256,7 @@ export class Morphling extends BaseContract {
 
     deposit_reward_token(
       _amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
     get_cover_token_address(overrides?: CallOverrides): Promise<[string[]]>;
@@ -330,7 +330,7 @@ export class Morphling extends BaseContract {
 
   deposit_reward_token(
     _amount: BigNumberish,
-    overrides?: Overrides & { from?: string | Promise<string> }
+    overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
   get_cover_token_address(overrides?: CallOverrides): Promise<string[]>;
@@ -481,7 +481,7 @@ export class Morphling extends BaseContract {
 
     deposit_reward_token(
       _amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
     get_cover_token_address(overrides?: CallOverrides): Promise<BigNumber>;
@@ -556,7 +556,7 @@ export class Morphling extends BaseContract {
 
     deposit_reward_token(
       _amount: BigNumberish,
-      overrides?: Overrides & { from?: string | Promise<string> }
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     get_cover_token_address(

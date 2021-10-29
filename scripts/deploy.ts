@@ -15,7 +15,7 @@ async function main() {
 
   // We get the contract to deploy
   const Morphling = await hre.ethers.getContractFactory("Morphling");
-  const morphling = await Morphling.deploy(5, process.env.REWARD_TOKEN); // BUSD
+  const morphling = await Morphling.deploy(5, process.env.NEXT_PUBLIC_REWARD_TOKEN); // BUSD
 
   await morphling.deployed();
 
