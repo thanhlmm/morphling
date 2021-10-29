@@ -6,6 +6,13 @@ import { BigNumber } from "@ethersproject/contracts/node_modules/@ethersproject/
 
 export const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
 
+export const CONTRACT_STATE = {
+  FUNDING: '1',
+  LOCKING: '2',
+  REWARD: '3',
+  CLAIM_COVER: '4'
+}
+
 // TODO: Leverage contract abi into Typescript
 export function getContract(): Contract {
   return new Contract(CONTRACT_ADDRESS, contract.abi)
