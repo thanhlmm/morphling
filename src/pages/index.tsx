@@ -24,8 +24,20 @@ function App() {
         <div>
           <p>
             Built with ❤️ from{" "}
-            <a className="link" href="https://thanhle.blog">
+            <a className="link" target="_blank" href="https://thanhle.blog">
               Thanh Le
+            </a>
+          </p>
+          <p>
+            Contract addres:{" "}
+            <a
+              className="link"
+              target="_blank"
+              href={`https://${process.env.NEXT_PUBLIC_NETWORK === "MAINNET" ? "" : "testnet."}bscscan.com/address/${
+                process.env.NEXT_PUBLIC_CONTRACT_ADDRESS
+              }`}
+            >
+              {process.env.NEXT_PUBLIC_CONTRACT_ADDRESS}
             </a>
           </p>
         </div>
