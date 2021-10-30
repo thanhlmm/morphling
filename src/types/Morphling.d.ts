@@ -46,6 +46,7 @@ interface MorphlingInterface extends ethers.utils.Interface {
     "withdraw_bnb(uint256)": FunctionFragment;
     "withdraw_cover(address)": FunctionFragment;
     "withdraw_fund(address)": FunctionFragment;
+    "withdraw_reward_bonus()": FunctionFragment;
   };
 
   encodeFunctionData(
@@ -135,6 +136,10 @@ interface MorphlingInterface extends ethers.utils.Interface {
     functionFragment: "withdraw_fund",
     values: [string]
   ): string;
+  encodeFunctionData(
+    functionFragment: "withdraw_reward_bonus",
+    values?: undefined
+  ): string;
 
   decodeFunctionResult(
     functionFragment: "bonus_percent",
@@ -221,6 +226,10 @@ interface MorphlingInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "withdraw_fund",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "withdraw_reward_bonus",
     data: BytesLike
   ): Result;
 
@@ -370,6 +379,10 @@ export class Morphling extends BaseContract {
       _to: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
+
+    withdraw_reward_bonus(
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
   };
 
   bonus_percent(overrides?: CallOverrides): Promise<BigNumber>;
@@ -458,6 +471,10 @@ export class Morphling extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  withdraw_reward_bonus(
+    overrides?: PayableOverrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   callStatic: {
     bonus_percent(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -537,6 +554,8 @@ export class Morphling extends BaseContract {
     ): Promise<void>;
 
     withdraw_fund(_to: string, overrides?: CallOverrides): Promise<void>;
+
+    withdraw_reward_bonus(overrides?: CallOverrides): Promise<void>;
   };
 
   filters: {
@@ -649,6 +668,10 @@ export class Morphling extends BaseContract {
       _to: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
+
+    withdraw_reward_bonus(
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
@@ -748,6 +771,10 @@ export class Morphling extends BaseContract {
     withdraw_fund(
       _to: string,
       overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    withdraw_reward_bonus(
+      overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
   };
 }
