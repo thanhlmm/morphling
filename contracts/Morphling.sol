@@ -145,12 +145,12 @@ contract Morphling is Ownable {
     }
 
     function get_reward_bnb(address _address) public view returns (uint256) {
-        uint256 share = get_user_share(msg.sender);
+        uint256 share = get_user_share(_address);
         return (reward_bnb_total * share) / ROUND;
     }
 
     function get_reward_token(address _address) public view returns (uint256) {
-        uint256 share = get_user_share(msg.sender);
+        uint256 share = get_user_share(_address);
         uint256 fee = 0;
         if (staking_pool[_address] > min_free) {
             // Charge extra fee if user stack higher than min_free
@@ -164,10 +164,8 @@ contract Morphling is Ownable {
         require(state == 3, "Only withdrawlable in Reward phase");
         require(staking_pool[msg.sender] > 0, "You dont have BNB to withdraw");
         console.log("Start withdraw reward");
-        uint256 share = get_user_share(msg.sender);
-
+        
         staking_pool[msg.sender] = 0;
-
         address payable recipient = payable(msg.sender);
 
         // Withdraw BNB
