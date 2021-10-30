@@ -6,22 +6,25 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Morphling is Ownable {
-    uint256 private bonus_percent;
+    uint256 public bonus_percent;
     mapping (address => uint256) cover_tokens;
     address[] cover_tokens_address;
     uint256 private cover_pool_total;
     mapping (address => uint256) staking_pool;
     uint256 private staking_pool_total = 0;
+    uint256 private staking_pool_fee_total = 0; // Store chargeable pool
     uint256 private reward_bnb_total;
     uint256 private reward_token_total;
     IERC20 reward_token;
 
     uint8 private state = 1; // 1.funding, 2.locking, 3.reward, 4.claim_cover
     uint16 private ROUND = 1000;
+    uint256 public min_free;
 
-    constructor(uint256 _bonus_percent, address _reward_token) {
+    constructor(uint256 _bonus_percent, uint256 _min_free, address _reward_token) {
         console.log("Deploying Morphling");
         bonus_percent = _bonus_percent;
+        min_free = _min_free;
 
         // TODO: Maybe we can delay to put reward address
         reward_token = IERC20(_reward_token);
@@ -66,9 +69,16 @@ contract Morphling is Ownable {
         return user_share;
     }
 
+    function get_my_staking(address _user) public view returns (uint256) {
+        return staking_pool[_user];
+    }
+
     function deposit_fund() payable public {
         staking_pool[msg.sender] += msg.value;
         staking_pool_total += msg.value;
+        if (msg.value > min_free) {
+            staking_pool_fee_total += msg.value;
+        }
     }
 
     function withdraw_bnb(uint256 _amount) payable public {
@@ -134,6 +144,22 @@ contract Morphling is Ownable {
         reward_token_total += _amount;
     }
 
+    function get_reward_bnb(address _address) public view returns (uint256) {
+        uint256 share = get_user_share(msg.sender);
+        return (reward_bnb_total * share) / ROUND;
+    }
+
+    function get_reward_token(address _address) public view returns (uint256) {
+        uint256 share = get_user_share(msg.sender);
+        uint256 fee = 0;
+        if (staking_pool[_address] > min_free) {
+            // Charge extra fee if user stack higher than min_free
+            fee = bonus_percent;
+        }
+
+        return ((reward_token_total * share) / ROUND)*((100 * ROUND - fee * ROUND) / ROUND);
+    }
+
     function widthdraw_reward() public {
         require(state == 3, "Only withdrawlable in Reward phase");
         require(staking_pool[msg.sender] > 0, "You dont have BNB to withdraw");
@@ -143,12 +169,22 @@ contract Morphling is Ownable {
         staking_pool[msg.sender] = 0;
 
         address payable recipient = payable(msg.sender);
+
         // Withdraw BNB
-        bool sent = recipient.send((reward_bnb_total * share) / ROUND);
+        bool sent = recipient.send(get_reward_bnb(msg.sender));
         require(sent, "Failed to send BNB");
+
         // Withdraw Token
-        bool sentToken = reward_token.transfer(msg.sender, (reward_token_total * share) / ROUND);
+        bool sentToken = reward_token.transfer(msg.sender, get_reward_token(msg.sender));
         require(sentToken, "Failed to send Token");
+    }
+
+    function withdraw_reward_bonus() payable public onlyOwner {
+        require(staking_pool_fee_total > 0, "The bonus pool is over");
+
+        bool sentToken = reward_token.transfer(msg.sender, staking_pool_fee_total * (bonus_percent * ROUND) / ROUND);
+        require(sentToken, "Failed to send Token");
+        staking_pool_fee_total = 0;
     }
 
     /**

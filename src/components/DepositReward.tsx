@@ -6,7 +6,7 @@ import { BigNumber } from "ethers";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
-import { checkApprove, getContract, getERC20Contract, getTokenBalance } from "../dapp/contract";
+import { checkApprove, getContract, getERC20Contract, getTokenBalance, WAIT_BLOCK } from "../dapp/contract";
 
 const DepositReward = () => {
   const { account, library, chainId } = useWeb3React<Web3Provider>();
@@ -56,9 +56,9 @@ const DepositReward = () => {
     }
   }, [library, account]);
 
-  const handleClickPreset = (percent: number) => {
-    setValue("amount", formatUnits(maximum.mul(BigNumber.from(percent)).div(BigNumber.from(100))));
-  };
+  // const handleClickPreset = (percent: number) => {
+  //   setValue("amount", formatUnits(maximum.mul(BigNumber.from(percent)).div(BigNumber.from(100))));
+  // };
 
   const handleClickPresetToken = (percent: number) => {
     setValue("tokenAmount", formatUnits(maximumToken.mul(BigNumber.from(percent)).div(BigNumber.from(100))));
@@ -82,7 +82,7 @@ const DepositReward = () => {
           .then((data) => {
             console.log(data);
             if (data.wait) {
-              return data.wait(7);
+              return data.wait(WAIT_BLOCK);
             }
           })
           .then(() => {
@@ -106,7 +106,7 @@ const DepositReward = () => {
         .approve(process.env.NEXT_PUBLIC_REWARD_TOKEN, MaxUint256)
         .then((data) => {
           if (data.wait) {
-            return data.wait(7);
+            return data.wait(WAIT_BLOCK);
           }
 
           return true;
@@ -141,36 +141,6 @@ const DepositReward = () => {
             {...register("amount", { required: true, min: 0 })}
           />
         </div>
-      </div>
-      <div className="flex justify-between my-4">
-        <button
-          type="button"
-          onClick={() => handleClickPreset(25)}
-          className="px-6 btn btn-outline btn-secondary btn-sm"
-        >
-          25%
-        </button>
-        <button
-          type="button"
-          onClick={() => handleClickPreset(50)}
-          className="px-6 btn btn-outline btn-secondary btn-sm"
-        >
-          50%
-        </button>
-        <button
-          type="button"
-          onClick={() => handleClickPreset(70)}
-          className="px-6 btn btn-outline btn-secondary btn-sm"
-        >
-          75%
-        </button>
-        <button
-          type="button"
-          onClick={() => handleClickPreset(100)}
-          className="px-6 btn btn-outline btn-secondary btn-sm"
-        >
-          100%
-        </button>
       </div>
 
       <div className="form-control">

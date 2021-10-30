@@ -9,7 +9,7 @@ import dynamic from "next/dynamic";
 import numeral from "numeral";
 import { useEffect, useMemo, useState } from "react";
 
-import { CONTRACT_ADDRESS, CONTRACT_STATE, getContract } from "../dapp/contract";
+import { CONTRACT_ADDRESS, CONTRACT_STATE, getContract, WAIT_BLOCK } from "../dapp/contract";
 import { getTokenPrice, getUserTokensBalance } from "../dapp/molaris";
 import useContractView from "../hooks/useContractView";
 import Countdown from "./Countdown";
@@ -32,10 +32,15 @@ const Funding = () => {
 
   const launchpadState = useContractView("get_state", [], BigNumber.from(1));
   const launchpadStateStr = launchpadState.toString();
+  const minFree = useContractView("min_free", [], BigNumber.from(0));
+  const fee = useContractView("bonus_percent", [], BigNumber.from(0));
   const totalStacking = useContractView("get_total_fund", [], BigNumber.from(0));
+  const myStacking = useContractView("get_my_staking", [account], BigNumber.from(0));
   const userShare = useContractView("get_user_share", [account], BigNumber.from(0));
   const totalRewardToken = useContractView("get_total_reward_token", [], BigNumber.from(0));
   const totalRewardBNB = useContractView("get_total_reward_bnb", [], BigNumber.from(0));
+  const myRewardBNB = useContractView("get_reward_bnb", [account], BigNumber.from(0));
+  const myRewardToken = useContractView("get_reward_token", [account], BigNumber.from(0));
   const contractOwner = useContractView("owner", [], "");
   const isContractOwner = account && account.toUpperCase() === contractOwner?.toUpperCase();
 
@@ -61,7 +66,7 @@ const Funding = () => {
       .withdraw_fund(account)
       .then((data) => {
         if (data.wait) {
-          return data.wait(7);
+          return data.wait(WAIT_BLOCK);
         }
       })
       .then(() => {
@@ -76,7 +81,22 @@ const Funding = () => {
       .widthdraw_reward()
       .then((data) => {
         if (data.wait) {
-          return data.wait(7);
+          return data.wait(WAIT_BLOCK);
+        }
+      })
+      .then(() => {
+        // TODO: Close modal
+      });
+  };
+
+  const handleWithdrawBonus = () => {
+    const contract = getContract();
+    contract
+      .connect(library.getSigner())
+      .withdraw_reward_bonus()
+      .then((data) => {
+        if (data.wait) {
+          return data.wait(WAIT_BLOCK);
         }
       })
       .then(() => {
@@ -94,7 +114,7 @@ const Funding = () => {
             .update_status(BigNumber.from(CONTRACT_STATE.LOCKING))
             .then((data) => {
               if (data.wait) {
-                return data.wait(7);
+                return data.wait(WAIT_BLOCK);
               }
             })
             .then(() => {
@@ -109,7 +129,7 @@ const Funding = () => {
             .update_status(BigNumber.from(CONTRACT_STATE.REWARD))
             .then((data) => {
               if (data.wait) {
-                return data.wait(7);
+                return data.wait(WAIT_BLOCK);
               }
             })
             .then(() => {
@@ -157,6 +177,14 @@ const Funding = () => {
         </ul>
       </div>
 
+      <div className="my-2 mb-4 alert alert-success">
+        <div className="flex-1">
+          <label className="font-bold">
+            <span className="text-xl">🤝</span> Staking lower than {formatUnits(minFree)} BNB is FREE
+          </label>
+        </div>
+      </div>
+
       <div className="flex">
         <div className="flex flex-col">
           <div className="items-start stats">
@@ -165,17 +193,20 @@ const Funding = () => {
               {/* <div className="stat-value">{numeral(totalCover, "$0,0.00")}</div> */}
               <div className="stat-value">{numeral(totalCover).format("$0,0.00")}</div>
               <div className="space-x-2 stat-actions">
-                <div data-tip="Building" className="tooltip tooltip-warning tooltip-right">
+                {/* <div data-tip="Building" className="tooltip tooltip-warning tooltip-right">
                   <button className="btn btn-sm btn-success" disabled>
                     Claim
                   </button>
-                </div>
+                </div> */}
               </div>
             </div>
             <div className="stat !border-0">
-              <div className="stat-title">Current staking</div>
+              <div className="stat-title">Current staking (BNB)</div>
               <div className="stat-value">
-                <FormatNumber number={totalStacking} unit="BNB" />
+                <FormatNumber number={totalStacking} />
+              </div>
+              <div className="text-xl stat-desc text-success">
+                Your: <FormatNumber number={myStacking} />
               </div>
               <div className="space-x-2 stat-actions">
                 <a
@@ -199,15 +230,21 @@ const Funding = () => {
             <div className="">
               <div className="flex flex-row">
                 <div className="stat">
-                  <div className="stat-title">Lazio</div>
+                  <div className="stat-title">{process.env.NEXT_PUBLIC_REWARD_TOKEN_NAME}</div>
                   <div className="stat-value">
                     <FormatNumber number={totalRewardToken} />
+                  </div>
+                  <div className="text-xl stat-desc text-success">
+                    Your: <FormatNumber number={myRewardToken} />
                   </div>
                 </div>
                 <div className="stat !border-0">
                   <div className="stat-title">BNB</div>
                   <div className="stat-value">
                     <FormatNumber number={totalRewardBNB} />
+                  </div>
+                  <div className="text-xl stat-desc text-success">
+                    Your: <FormatNumber number={myRewardBNB} />
                   </div>
                 </div>
               </div>
@@ -236,6 +273,16 @@ const Funding = () => {
               <p>Your share in staking pool. The reward will returns based on this share</p>
             </div>
           </div>
+          <div className="!border-0 stat">
+            <div className="stat-title">Fee</div>
+            <div className="flex stat-value">{Number(fee.toString())}%</div>
+            <div className="stat-desc text-info">of reward token only</div>
+            <div className="max-w-md whitespace-normal stat-actions">
+              <p>
+                Staking lower than <strong>{formatUnits(minFree)} BNB</strong> is FREE.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -253,11 +300,11 @@ const Funding = () => {
             2. Withdraw staking fund
           </button>
 
-          <a href="#deposit-reward" className="btn btn-info">
+          <a href="#deposit-reward" className={cls("btn", { "btn-info": isLocking, "btn-disabled": !isLocking })}>
             3. Deposit reward
           </a>
 
-          <button disabled={!isReward} className="btn btn-info">
+          <button onClick={handleWithdrawBonus} disabled={!isReward} className="btn btn-info">
             4. Get reward
           </button>
 

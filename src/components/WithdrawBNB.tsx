@@ -5,7 +5,7 @@ import { BigNumber } from "ethers";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 
-import { getContract } from "../dapp/contract";
+import { getContract, WAIT_BLOCK } from "../dapp/contract";
 import useContractView from "../hooks/useContractView";
 
 const DepositBNB = () => {
@@ -45,7 +45,7 @@ const DepositBNB = () => {
         .then((data) => {
           console.log(data);
           if (data.wait) {
-            return data.wait(7);
+            return data.wait(WAIT_BLOCK);
           }
           return true;
         })

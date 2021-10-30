@@ -5,7 +5,7 @@ export default function Demo() {
   return (
     <>
       <Header />
-      <div className="w-full bg-white shadow stats">
+      {/* <div className="w-full bg-white shadow stats">
         <div className="stat">
           <div className="stat-figure text-primary">
             <svg
@@ -64,7 +64,7 @@ export default function Demo() {
           <div className="stat-title">Success rate</div>
           <div className="stat-value text-success">86%</div>
         </div>
-      </div>
+      </div> */}
 
       <div>
         <Funding />

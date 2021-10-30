@@ -5,7 +5,7 @@ import { BigNumber } from "ethers";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
-import { getContract } from "../dapp/contract";
+import { getContract, WAIT_BLOCK } from "../dapp/contract";
 
 const DepositBNB = () => {
   const { account, library, chainId } = useWeb3React<Web3Provider>();
@@ -48,7 +48,7 @@ const DepositBNB = () => {
         .then((data) => {
           console.log(data);
           if (data.wait) {
-            return data.wait(7);
+            return data.wait(WAIT_BLOCK);
           }
           return true;
         })

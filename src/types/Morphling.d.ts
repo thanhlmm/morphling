@@ -22,16 +22,21 @@ import type { TypedEventFilter, TypedEvent, TypedListener } from "./common";
 
 interface MorphlingInterface extends ethers.utils.Interface {
   functions: {
+    "bonus_percent()": FunctionFragment;
     "deposit_cover(address,uint256)": FunctionFragment;
     "deposit_fund()": FunctionFragment;
     "deposit_reward_bnb()": FunctionFragment;
     "deposit_reward_token(uint256)": FunctionFragment;
     "get_cover_token_address()": FunctionFragment;
+    "get_my_staking(address)": FunctionFragment;
+    "get_reward_bnb(address)": FunctionFragment;
+    "get_reward_token(address)": FunctionFragment;
     "get_state()": FunctionFragment;
     "get_total_fund()": FunctionFragment;
     "get_total_reward_bnb()": FunctionFragment;
     "get_total_reward_token()": FunctionFragment;
     "get_user_share(address)": FunctionFragment;
+    "min_free()": FunctionFragment;
     "owner()": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
     "request_cover()": FunctionFragment;
@@ -43,6 +48,10 @@ interface MorphlingInterface extends ethers.utils.Interface {
     "withdraw_fund(address)": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "bonus_percent",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "deposit_cover",
     values: [string, BigNumberish]
@@ -63,6 +72,18 @@ interface MorphlingInterface extends ethers.utils.Interface {
     functionFragment: "get_cover_token_address",
     values?: undefined
   ): string;
+  encodeFunctionData(
+    functionFragment: "get_my_staking",
+    values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "get_reward_bnb",
+    values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "get_reward_token",
+    values: [string]
+  ): string;
   encodeFunctionData(functionFragment: "get_state", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "get_total_fund",
@@ -80,6 +101,7 @@ interface MorphlingInterface extends ethers.utils.Interface {
     functionFragment: "get_user_share",
     values: [string]
   ): string;
+  encodeFunctionData(functionFragment: "min_free", values?: undefined): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "renounceOwnership",
@@ -115,6 +137,10 @@ interface MorphlingInterface extends ethers.utils.Interface {
   ): string;
 
   decodeFunctionResult(
+    functionFragment: "bonus_percent",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
     functionFragment: "deposit_cover",
     data: BytesLike
   ): Result;
@@ -134,6 +160,18 @@ interface MorphlingInterface extends ethers.utils.Interface {
     functionFragment: "get_cover_token_address",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(
+    functionFragment: "get_my_staking",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "get_reward_bnb",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "get_reward_token",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(functionFragment: "get_state", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "get_total_fund",
@@ -151,6 +189,7 @@ interface MorphlingInterface extends ethers.utils.Interface {
     functionFragment: "get_user_share",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "min_free", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "renounceOwnership",
@@ -240,6 +279,8 @@ export class Morphling extends BaseContract {
   interface: MorphlingInterface;
 
   functions: {
+    bonus_percent(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     deposit_cover(
       _token_address: string,
       _amount: BigNumberish,
@@ -261,6 +302,21 @@ export class Morphling extends BaseContract {
 
     get_cover_token_address(overrides?: CallOverrides): Promise<[string[]]>;
 
+    get_my_staking(
+      _user: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    get_reward_bnb(
+      _address: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
+    get_reward_token(
+      _address: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
     get_state(overrides?: CallOverrides): Promise<[number]>;
 
     get_total_fund(overrides?: CallOverrides): Promise<[BigNumber]>;
@@ -273,6 +329,8 @@ export class Morphling extends BaseContract {
       _user: string,
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
+
+    min_free(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     owner(overrides?: CallOverrides): Promise<[string]>;
 
@@ -314,6 +372,8 @@ export class Morphling extends BaseContract {
     ): Promise<ContractTransaction>;
   };
 
+  bonus_percent(overrides?: CallOverrides): Promise<BigNumber>;
+
   deposit_cover(
     _token_address: string,
     _amount: BigNumberish,
@@ -335,6 +395,18 @@ export class Morphling extends BaseContract {
 
   get_cover_token_address(overrides?: CallOverrides): Promise<string[]>;
 
+  get_my_staking(_user: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+  get_reward_bnb(
+    _address: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
+  get_reward_token(
+    _address: string,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
+
   get_state(overrides?: CallOverrides): Promise<number>;
 
   get_total_fund(overrides?: CallOverrides): Promise<BigNumber>;
@@ -344,6 +416,8 @@ export class Morphling extends BaseContract {
   get_total_reward_token(overrides?: CallOverrides): Promise<BigNumber>;
 
   get_user_share(_user: string, overrides?: CallOverrides): Promise<BigNumber>;
+
+  min_free(overrides?: CallOverrides): Promise<BigNumber>;
 
   owner(overrides?: CallOverrides): Promise<string>;
 
@@ -385,6 +459,8 @@ export class Morphling extends BaseContract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
+    bonus_percent(overrides?: CallOverrides): Promise<BigNumber>;
+
     deposit_cover(
       _token_address: string,
       _amount: BigNumberish,
@@ -402,6 +478,21 @@ export class Morphling extends BaseContract {
 
     get_cover_token_address(overrides?: CallOverrides): Promise<string[]>;
 
+    get_my_staking(
+      _user: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    get_reward_bnb(
+      _address: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    get_reward_token(
+      _address: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     get_state(overrides?: CallOverrides): Promise<number>;
 
     get_total_fund(overrides?: CallOverrides): Promise<BigNumber>;
@@ -414,6 +505,8 @@ export class Morphling extends BaseContract {
       _user: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    min_free(overrides?: CallOverrides): Promise<BigNumber>;
 
     owner(overrides?: CallOverrides): Promise<string>;
 
@@ -465,6 +558,8 @@ export class Morphling extends BaseContract {
   };
 
   estimateGas: {
+    bonus_percent(overrides?: CallOverrides): Promise<BigNumber>;
+
     deposit_cover(
       _token_address: string,
       _amount: BigNumberish,
@@ -486,6 +581,21 @@ export class Morphling extends BaseContract {
 
     get_cover_token_address(overrides?: CallOverrides): Promise<BigNumber>;
 
+    get_my_staking(
+      _user: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    get_reward_bnb(
+      _address: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    get_reward_token(
+      _address: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     get_state(overrides?: CallOverrides): Promise<BigNumber>;
 
     get_total_fund(overrides?: CallOverrides): Promise<BigNumber>;
@@ -498,6 +608,8 @@ export class Morphling extends BaseContract {
       _user: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    min_free(overrides?: CallOverrides): Promise<BigNumber>;
 
     owner(overrides?: CallOverrides): Promise<BigNumber>;
 
@@ -540,6 +652,8 @@ export class Morphling extends BaseContract {
   };
 
   populateTransaction: {
+    bonus_percent(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     deposit_cover(
       _token_address: string,
       _amount: BigNumberish,
@@ -563,6 +677,21 @@ export class Morphling extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
+    get_my_staking(
+      _user: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    get_reward_bnb(
+      _address: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    get_reward_token(
+      _address: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     get_state(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     get_total_fund(overrides?: CallOverrides): Promise<PopulatedTransaction>;
@@ -579,6 +708,8 @@ export class Morphling extends BaseContract {
       _user: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
+
+    min_free(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 

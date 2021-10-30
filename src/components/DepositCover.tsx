@@ -6,7 +6,14 @@ import { useWeb3React } from "@web3-react/core";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
-import { checkApprove, getERC20Contract, getTokenBalance, CONTRACT_ADDRESS, getContract } from "../dapp/contract";
+import {
+  checkApprove,
+  getERC20Contract,
+  getTokenBalance,
+  CONTRACT_ADDRESS,
+  getContract,
+  WAIT_BLOCK,
+} from "../dapp/contract";
 import { TOKENS } from "../dapp/tokens";
 
 const DepositCover = () => {
@@ -59,7 +66,7 @@ const DepositCover = () => {
           .then((data) => {
             console.log(data);
             if (data.wait) {
-              return data.wait(7);
+              return data.wait(WAIT_BLOCK);
             }
           })
           .then(() => {
@@ -83,7 +90,7 @@ const DepositCover = () => {
         .approve(CONTRACT_ADDRESS, MaxUint256)
         .then((data) => {
           if (data.wait) {
-            return data.wait(7);
+            return data.wait(WAIT_BLOCK);
           }
 
           return true;

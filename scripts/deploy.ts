@@ -3,6 +3,7 @@
 //
 // When running the script with `npx hardhat run <script>` you'll find the Hardhat
 // Runtime Environment's members available in the global scope.
+import { parseUnits } from "@ethersproject/units";
 import hre from "hardhat";
 
 async function main() {
@@ -15,7 +16,7 @@ async function main() {
 
   // We get the contract to deploy
   const Morphling = await hre.ethers.getContractFactory("Morphling");
-  const morphling = await Morphling.deploy(5, process.env.NEXT_PUBLIC_REWARD_TOKEN); // BUSD
+  const morphling = await Morphling.deploy(5, parseUnits('5'), process.env.NEXT_PUBLIC_REWARD_TOKEN); // BUSD
 
   await morphling.deployed();
 
