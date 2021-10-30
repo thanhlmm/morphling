@@ -157,7 +157,7 @@ contract Morphling is Ownable {
             fee = bonus_percent;
         }
 
-        return ((reward_token_total * share) / ROUND)*((100 * ROUND - fee * ROUND) / ROUND);
+        return ((reward_token_total * share) / ROUND)*((100 - fee) / 100); // TODO: Fix this to more accuracy percent
     }
 
     function widthdraw_reward() public {
