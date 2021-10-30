@@ -78,7 +78,7 @@ const DepositReward = () => {
         const contract = getContract();
         contract
           .connect(library.getSigner())
-          .deposit_NEXT_PUBLIC_REWARD_TOKEN(parseUnits(data.tokenAmount), { value: parseUnits(data.amount) })
+          .deposit_reward_token(parseUnits(data.tokenAmount), { value: parseUnits(data.amount) })
           .then((data) => {
             console.log(data);
             if (data.wait) {
