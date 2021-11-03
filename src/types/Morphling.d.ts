@@ -41,6 +41,7 @@ interface MorphlingInterface extends ethers.utils.Interface {
     "owner()": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
     "request_cover()": FunctionFragment;
+    "set_reward_token_address(address)": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
     "update_status(uint8)": FunctionFragment;
     "widthdraw_reward()": FunctionFragment;
@@ -116,6 +117,10 @@ interface MorphlingInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "request_cover",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "set_reward_token_address",
+    values: [string]
   ): string;
   encodeFunctionData(
     functionFragment: "transferOwnership",
@@ -211,6 +216,10 @@ interface MorphlingInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "request_cover",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "set_reward_token_address",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -362,6 +371,11 @@ export class Morphling extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    set_reward_token_address(
+      _token_address: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     transferOwnership(
       newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -455,6 +469,11 @@ export class Morphling extends BaseContract {
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  set_reward_token_address(
+    _token_address: string,
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   transferOwnership(
     newOwner: string,
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -545,6 +564,11 @@ export class Morphling extends BaseContract {
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
 
     request_cover(overrides?: CallOverrides): Promise<void>;
+
+    set_reward_token_address(
+      _token_address: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
 
     transferOwnership(
       newOwner: string,
@@ -657,6 +681,11 @@ export class Morphling extends BaseContract {
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    set_reward_token_address(
+      _token_address: string,
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     transferOwnership(
       newOwner: string,
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -762,6 +791,11 @@ export class Morphling extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     request_cover(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    set_reward_token_address(
+      _token_address: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 

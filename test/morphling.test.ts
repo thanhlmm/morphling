@@ -106,9 +106,21 @@ describe("Morphling", function () {
     expect(await morphling.get_total_fund()).equal(
       totalFundPool.sub(DEPOSIT_BNB.div(2))
     );
+
     expect(await morphling.get_user_share(addr1.address)).to.equal(ROUND.div(3)); // 33%
     expect(await morphling.get_user_share(addr2.address)).to.equal(ROUND.div(3).mul(2)); // 66%
     expect(await morphling.get_staking_pool_fee_total()).equal(DEPOSIT_BNB); // Only apply fee for user 2
+  });
+
+  it("Shoud not be able to withdraw BNB larger than staking", async function () {
+    const [owner, addr1] = await ethers.getSigners();
+
+    try {
+      const tx = await morphling.connect(addr1).withdraw_bnb(DEPOSIT_BNB);
+      await tx.wait();
+    } catch (error) {
+      expect(error.message).include("Out of amount");
+    }
   });
 
   /**

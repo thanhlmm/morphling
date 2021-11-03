@@ -15,7 +15,7 @@ contract Morphling is Ownable {
     uint256 private staking_pool_fee_total = 0; // Store chargeable pool
     uint256 private reward_bnb_total;
     uint256 private reward_token_total;
-    IERC20 reward_token;
+    address reward_token;
 
     uint8 private state = 1; // 1.funding, 2.locking, 3.reward, 4.claim_cover
     uint32 private ROUND = 1000000;
@@ -32,7 +32,7 @@ contract Morphling is Ownable {
         min_free = _min_free;
 
         // TODO: Maybe we can delay to put reward address
-        reward_token = IERC20(_reward_token);
+        reward_token = _reward_token;
     }
 
     function get_state() public view returns (uint8) {
@@ -60,6 +60,12 @@ contract Morphling is Ownable {
         }
     }
 
+    function set_reward_token_address(address _token_address) public onlyOwner {
+        require(state == 1 || state == 2, "Last state must be Locking (2)");
+        require(reward_token_total == 0, "Must be empty reward pool");
+        reward_token = _token_address;
+    }
+
     /**
         Funding step
     */
@@ -80,8 +86,8 @@ contract Morphling is Ownable {
 
     function deposit_fund() payable public atStage(1) {
         // DONE: What if deposit 2 time. 1st time below FEE baseline and 2nd time large than FEE baseline
+        // TODO: Optimize by store staking_pool_fee_total change in memory var
         if (staking_pool[msg.sender] > min_free) {
-            // TODO: Optimize by store in memory var
             staking_pool_fee_total -= staking_pool[msg.sender];
         }
         
@@ -95,7 +101,7 @@ contract Morphling is Ownable {
 
     function withdraw_bnb(uint256 _amount) payable public atStage(1) {
         require(state == 1, "Only withdrawable in Funding phase");
-        require(_amount <= staking_pool[msg.sender], "out of amount");
+        require(_amount <= staking_pool[msg.sender], "Out of amount");
 
         if (staking_pool[msg.sender] > min_free) {
             staking_pool_fee_total -= staking_pool[msg.sender];
@@ -155,9 +161,11 @@ contract Morphling is Ownable {
     }
 
     function deposit_reward_token(uint256 _amount) payable public onlyOwner atStage(2) {
-        uint256 tokenBalance = reward_token.balanceOf(msg.sender);
+        require(reward_token != address(0), "Missing reward token address");
+        IERC20 rewardToken = IERC20(reward_token);
+        uint256 tokenBalance = rewardToken.balanceOf(msg.sender);
         require(_amount <= tokenBalance, "balance is low");
-        reward_token.transferFrom(msg.sender, address(this), _amount);
+        rewardToken.transferFrom(msg.sender, address(this), _amount);
 
         reward_bnb_total += msg.value;
         reward_token_total += _amount;
@@ -190,7 +198,8 @@ contract Morphling is Ownable {
         require(sent, "Failed to send BNB");
 
         // Withdraw Token
-        bool sentToken = reward_token.transfer(msg.sender, get_reward_token(msg.sender));
+        IERC20 rewardToken = IERC20(reward_token);
+        bool sentToken = rewardToken.transfer(msg.sender, get_reward_token(msg.sender));
         require(sentToken, "Failed to send Token");
 
         staking_pool[msg.sender] = 0;
@@ -203,7 +212,8 @@ contract Morphling is Ownable {
     function withdraw_reward_bonus() payable public onlyOwner atStage(3) {
         require(staking_pool_fee_total > 0, "The bonus pool is over");
 
-        bool sentToken = reward_token.transfer(msg.sender, staking_pool_fee_total * bonus_percent / 100 );
+        IERC20 rewardToken = IERC20(reward_token);
+        bool sentToken = rewardToken.transfer(msg.sender, staking_pool_fee_total * bonus_percent / 100 );
         require(sentToken, "Failed to send Token");
         staking_pool_fee_total = 0;
     }
