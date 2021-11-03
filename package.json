@@ -8,11 +8,11 @@
     "lint": "next lint",
     "prepare": "husky install",
     "lint:sol": "npx solhint 'contracts/**/*.sol'",
-    "test": "mocha --exit --recursive",
+    "test": "hardhat test",
     "compile": "hardhat compile",
     "deploy-local": "hardhat run scripts/deploy.ts --network localhost",
     "deploy-test": "hardhat run scripts/deploy.ts --network testnet",
-    "verify-test": "hardhat verify --constructor-args arguments.js 0x1a03a8789AC3f836C8ebdf6B99c74a091026aD9A --network testnet"
+    "verify-test": "hardhat verify --constructor-args arguments.js 0x9146a1e72bd5065A8E3c3e723e93889F6B38757E --network testnet"
   },
   "dependencies": {
     "@ethersproject/providers": "5.5.0",
