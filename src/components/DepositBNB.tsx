@@ -2,12 +2,14 @@ import { Web3Provider } from "@ethersproject/providers";
 import { formatUnits, parseUnits } from "@ethersproject/units";
 import { useWeb3React } from "@web3-react/core";
 import { BigNumber } from "ethers";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { getContract, WAIT_BLOCK } from "../dapp/contract";
 
 const DepositBNB = () => {
+  const router = useRouter();
   const { account, library, chainId } = useWeb3React<Web3Provider>();
   const [maximum, setMaximum] = useState<BigNumber>(BigNumber.from(0));
   const [loading, setLoading] = useState(false);
@@ -53,7 +55,7 @@ const DepositBNB = () => {
           return true;
         })
         .then(() => {
-          // TODO: Close modal
+          window.location.hash = "";
         });
     } catch (error) {
       setContractError(error?.message || "Error deposit token");

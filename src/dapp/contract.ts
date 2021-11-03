@@ -7,6 +7,7 @@ import { BigNumber } from "@ethersproject/contracts/node_modules/@ethersproject/
 export const CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
 
 export const WAIT_BLOCK = Number(process.env.NEXT_PUBLIC_BLOCK_CONFIRM) || 4;
+export const ROUND = 1000000 / 100;
 
 export const CONTRACT_STATE = {
   FUNDING: '1',

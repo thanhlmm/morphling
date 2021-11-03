@@ -86,7 +86,7 @@ const DepositReward = () => {
             }
           })
           .then(() => {
-            // TODO: Close modal
+            window.location.hash = "";
           });
       } catch (error) {
         setContractError(error?.message || "Error deposit token");

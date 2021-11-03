@@ -9,7 +9,7 @@ import dynamic from "next/dynamic";
 import numeral from "numeral";
 import { useEffect, useMemo, useState } from "react";
 
-import { CONTRACT_ADDRESS, CONTRACT_STATE, getContract, WAIT_BLOCK } from "../dapp/contract";
+import { CONTRACT_ADDRESS, CONTRACT_STATE, getContract, ROUND, WAIT_BLOCK } from "../dapp/contract";
 import { getTokenPrice, getUserTokensBalance } from "../dapp/molaris";
 import useContractView from "../hooks/useContractView";
 import Countdown from "./Countdown";
@@ -70,7 +70,7 @@ const Funding = () => {
         }
       })
       .then(() => {
-        // TODO: Close modal
+        window.location.hash = "";
       });
   };
 
@@ -85,7 +85,7 @@ const Funding = () => {
         }
       })
       .then(() => {
-        // TODO: Close modal
+        window.location.hash = "";
       });
   };
 
@@ -100,7 +100,7 @@ const Funding = () => {
         }
       })
       .then(() => {
-        // TODO: Close modal
+        // TODO: Show toast
       });
   };
 
@@ -118,7 +118,7 @@ const Funding = () => {
               }
             })
             .then(() => {
-              // TODO: Close modal
+              // TODO: Show toast
             });
         }
         break;
@@ -133,7 +133,7 @@ const Funding = () => {
               }
             })
             .then(() => {
-              // TODO: Close modal
+              // TODO: Show toast
             });
         }
         break;
@@ -268,7 +268,7 @@ const Funding = () => {
           </div>
           <div className="!border-0 stat">
             <div className="stat-title">Your share</div>
-            <div className="flex stat-value">{(userShare.toNumber() / 10).toFixed()}%</div>
+            <div className="flex stat-value">{(userShare.toNumber() / ROUND).toFixed()}%</div>
             <div className="max-w-md whitespace-normal stat-actions">
               <p>Your share in staking pool. The reward will returns based on this share</p>
             </div>
