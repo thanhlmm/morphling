@@ -31,6 +31,7 @@ interface MorphlingInterface extends ethers.utils.Interface {
     "get_my_staking(address)": FunctionFragment;
     "get_reward_bnb(address)": FunctionFragment;
     "get_reward_token(address)": FunctionFragment;
+    "get_staking_pool_fee_total()": FunctionFragment;
     "get_state()": FunctionFragment;
     "get_total_fund()": FunctionFragment;
     "get_total_reward_bnb()": FunctionFragment;
@@ -84,6 +85,10 @@ interface MorphlingInterface extends ethers.utils.Interface {
   encodeFunctionData(
     functionFragment: "get_reward_token",
     values: [string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "get_staking_pool_fee_total",
+    values?: undefined
   ): string;
   encodeFunctionData(functionFragment: "get_state", values?: undefined): string;
   encodeFunctionData(
@@ -175,6 +180,10 @@ interface MorphlingInterface extends ethers.utils.Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "get_reward_token",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "get_staking_pool_fee_total",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "get_state", data: BytesLike): Result;
@@ -326,6 +335,8 @@ export class Morphling extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
+    get_staking_pool_fee_total(overrides?: CallOverrides): Promise<[BigNumber]>;
+
     get_state(overrides?: CallOverrides): Promise<[number]>;
 
     get_total_fund(overrides?: CallOverrides): Promise<[BigNumber]>;
@@ -420,6 +431,8 @@ export class Morphling extends BaseContract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
+  get_staking_pool_fee_total(overrides?: CallOverrides): Promise<BigNumber>;
+
   get_state(overrides?: CallOverrides): Promise<number>;
 
   get_total_fund(overrides?: CallOverrides): Promise<BigNumber>;
@@ -509,6 +522,8 @@ export class Morphling extends BaseContract {
       _address: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    get_staking_pool_fee_total(overrides?: CallOverrides): Promise<BigNumber>;
 
     get_state(overrides?: CallOverrides): Promise<number>;
 
@@ -615,6 +630,8 @@ export class Morphling extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    get_staking_pool_fee_total(overrides?: CallOverrides): Promise<BigNumber>;
+
     get_state(overrides?: CallOverrides): Promise<BigNumber>;
 
     get_total_fund(overrides?: CallOverrides): Promise<BigNumber>;
@@ -712,6 +729,10 @@ export class Morphling extends BaseContract {
 
     get_reward_token(
       _address: string,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    get_staking_pool_fee_total(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
