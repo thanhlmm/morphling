@@ -6,7 +6,14 @@ import { BigNumber } from "ethers";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
-import { checkApprove, getContract, getERC20Contract, getTokenBalance, WAIT_BLOCK } from "../dapp/contract";
+import {
+  checkApprove,
+  CONTRACT_ADDRESS,
+  getContract,
+  getERC20Contract,
+  getTokenBalance,
+  WAIT_BLOCK,
+} from "../dapp/contract";
 
 const DepositReward = () => {
   const { account, library, chainId } = useWeb3React<Web3Provider>();
@@ -15,7 +22,7 @@ const DepositReward = () => {
   const [loading, setLoading] = useState(false);
   const [contractError, setContractError] = useState("");
   const [isApproved, setApproved] = useState<boolean>(false);
-
+  console.log({ isApproved });
   const {
     register,
     handleSubmit,
@@ -44,16 +51,14 @@ const DepositReward = () => {
   }, [library, account]); // TODO: Remove depend on library?
 
   const checkApproveToken = (tokenAddress: string) => {
-    checkApprove(tokenAddress, account, library).then(setApproved);
+    if (library && account) {
+      checkApprove(tokenAddress, account, library).then(setApproved);
+    }
   };
-
-  console.log(process.env.NEXT_PUBLIC_REWARD_TOKEN);
 
   useEffect(() => {
     // TODO: Query reward token from API?
-    if (library && account) {
-      checkApproveToken(process.env.NEXT_PUBLIC_REWARD_TOKEN);
-    }
+    checkApproveToken(process.env.NEXT_PUBLIC_REWARD_TOKEN);
   }, [library, account]);
 
   // const handleClickPreset = (percent: number) => {
@@ -100,10 +105,10 @@ const DepositReward = () => {
 
     try {
       setLoading(true);
-      console.log("start approve", library);
-      await getERC20Contract(data.token)
+      console.log("start approve");
+      await getERC20Contract(process.env.NEXT_PUBLIC_REWARD_TOKEN)
         .connect(library.getSigner())
-        .approve(process.env.NEXT_PUBLIC_REWARD_TOKEN, MaxUint256)
+        .approve(CONTRACT_ADDRESS, MaxUint256)
         .then((data) => {
           if (data.wait) {
             return data.wait(WAIT_BLOCK);
@@ -190,7 +195,7 @@ const DepositReward = () => {
       <p className="text-error">{contractError}</p>
       <div className="form-control">
         <button type="submit" className="btn btn-primary" disabled={!isConnected || loading}>
-          Deposit
+          {isApproved ? "Deposit" : "Approve"}
         </button>
       </div>
     </form>
