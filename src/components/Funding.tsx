@@ -275,7 +275,7 @@ const Funding = () => {
           </div>
           <div className="!border-0 stat">
             <div className="stat-title">Fee</div>
-            <div className="flex stat-value">{Number(fee.toString())}%</div>
+            <div className="flex stat-value">{myStacking > minFree ? Number(fee.toString()) : 0}%</div>
             <div className="stat-desc text-info">of reward token only</div>
             <div className="max-w-md whitespace-normal stat-actions">
               <p>
