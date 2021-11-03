@@ -268,7 +268,7 @@ const Funding = () => {
           </div>
           <div className="!border-0 stat">
             <div className="stat-title">Your share</div>
-            <div className="flex stat-value">{(userShare.toNumber() / ROUND).toFixed()}%</div>
+            <div className="flex stat-value">{(userShare.toNumber() / ROUND).toFixed(3)}%</div>
             <div className="max-w-md whitespace-normal stat-actions">
               <p>Your share in staking pool. The reward will returns based on this share</p>
             </div>
