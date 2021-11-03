@@ -85,7 +85,7 @@ const Funding = () => {
         }
       })
       .then(() => {
-        window.location.hash = "";
+        // TODO: Show firework
       });
   };
 
