@@ -21,9 +21,9 @@ import WithdrawBNB from "./WithdrawBNB";
 
 // TODO: Query from api
 const mockStateApi = {
-  funding: dayjs().add(1, "d").toDate(),
-  locking: dayjs().add(8, "d").toDate(),
-  reward: dayjs().add(8, "d").add(6, "h").toDate(),
+  funding: dayjs("2021-11-06 07:00").toDate(),
+  locking: dayjs("2021-11-16 13:00").toDate(),
+  reward: dayjs("2021-11-16 17:00").toDate(),
 };
 
 const Funding = () => {

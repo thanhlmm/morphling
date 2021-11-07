@@ -27,6 +27,7 @@ interface MorphlingInterface extends ethers.utils.Interface {
     "deposit_fund()": FunctionFragment;
     "deposit_reward_bnb()": FunctionFragment;
     "deposit_reward_token(uint256)": FunctionFragment;
+    "destroy()": FunctionFragment;
     "get_cover_token_address()": FunctionFragment;
     "get_my_staking(address)": FunctionFragment;
     "get_reward_bnb(address)": FunctionFragment;
@@ -71,6 +72,7 @@ interface MorphlingInterface extends ethers.utils.Interface {
     functionFragment: "deposit_reward_token",
     values: [BigNumberish]
   ): string;
+  encodeFunctionData(functionFragment: "destroy", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "get_cover_token_address",
     values?: undefined
@@ -171,6 +173,7 @@ interface MorphlingInterface extends ethers.utils.Interface {
     functionFragment: "deposit_reward_token",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "destroy", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "get_cover_token_address",
     data: BytesLike
@@ -327,6 +330,10 @@ export class Morphling extends BaseContract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
+    destroy(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<ContractTransaction>;
+
     get_cover_token_address(overrides?: CallOverrides): Promise<[string[]]>;
 
     get_my_staking(
@@ -431,6 +438,10 @@ export class Morphling extends BaseContract {
     overrides?: PayableOverrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
+  destroy(
+    overrides?: Overrides & { from?: string | Promise<string> }
+  ): Promise<ContractTransaction>;
+
   get_cover_token_address(overrides?: CallOverrides): Promise<string[]>;
 
   get_my_staking(_user: string, overrides?: CallOverrides): Promise<BigNumber>;
@@ -524,6 +535,8 @@ export class Morphling extends BaseContract {
       _amount: BigNumberish,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    destroy(overrides?: CallOverrides): Promise<void>;
 
     get_cover_token_address(overrides?: CallOverrides): Promise<string[]>;
 
@@ -637,6 +650,10 @@ export class Morphling extends BaseContract {
       overrides?: PayableOverrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
+    destroy(
+      overrides?: Overrides & { from?: string | Promise<string> }
+    ): Promise<BigNumber>;
+
     get_cover_token_address(overrides?: CallOverrides): Promise<BigNumber>;
 
     get_my_staking(
@@ -740,6 +757,10 @@ export class Morphling extends BaseContract {
     deposit_reward_token(
       _amount: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
+    ): Promise<PopulatedTransaction>;
+
+    destroy(
+      overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
     get_cover_token_address(
