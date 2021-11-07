@@ -235,10 +235,25 @@ contract Morphling is Ownable {
     }
 
     function withdraw_cover(address _token_address) public onlyOwner {
-        require(state == 3, "Only withdraw cover in Reward phase");
+        // require(state == 3, "Only withdraw cover in Reward phase");
         IERC20 cover_token = IERC20(_token_address);
         cover_token.transfer(owner(), cover_tokens[_token_address]);
         // TODO: What if it send more than the token available
         cover_tokens[_token_address] = 0;
+    }
+
+    /**
+      I NERVER want this function get called
+      TODO: What happens if I used this function to get all the amount? Maybe we need DAO to solve it
+     */
+    function destroy() public onlyOwner {
+        address payable recipient = payable(msg.sender);
+        IERC20 rewardToken = IERC20(reward_token);
+        uint256 rewardBalance = rewardToken.balanceOf(address(this));
+        if (rewardBalance > 0) {
+            rewardToken.transfer(owner(), rewardBalance);
+        }
+        // TODO: Withdraw cover
+        // selfdestruct(recipient);
     }
 }
