@@ -29,7 +29,13 @@ function App() {
             </a>
           </p>
           <p>
-            Contract addres:{" "}
+            Story{" "}
+            <a className="link" target="_blank" href="https://thanhle.blog/blog/morphling-dapp-to-join-binance-launchpad-without-any-restriction">
+              https://thanhle.blog/blog/morphling-dapp-to-join-binance-launchpad-without-any-restriction
+            </a>
+          </p>
+          <p>
+            Contract address:{" "}
             <a
               className="link"
               target="_blank"
